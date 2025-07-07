@@ -5,7 +5,6 @@ from scipy.stats import chisquare
 from n_gram_attack import QuadGramAttack
 from spellchecker import SpellChecker
 
-
 letterFrequency = {
     "E": 12.0,
     "T": 9.10,

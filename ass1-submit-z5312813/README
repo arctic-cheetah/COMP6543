@@ -1,0 +1,10 @@
+Notes for marker:
+
+Q1)-Q3) Written by hand with images of resources used.
+
+Q4) Run with python
+python3 q4_bday.py
+
+Q5) Please first install dependencies and libraries used:
+sudo pip3 install simanneal spellchecker scipy
+python3 q5.py

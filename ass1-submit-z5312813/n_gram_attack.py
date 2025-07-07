@@ -1,13 +1,9 @@
 import random, re
-import string
 from simanneal import Annealer
 from ngram_score import NGramScore
 
 
-# 1️⃣Build a quad-gram model from quadgrams.txt (James Lyons data)
-# Attribution! Obtain from quad-gram model from github
-# and used his library for n-grams
-# https://github.com/jameslyons/python_cryptanalysis
+# 1️⃣Build a quad-gram model from english_quadgrams.txt (James Lyons data)
 quad = NGramScore("quadgrams.txt")
 
 

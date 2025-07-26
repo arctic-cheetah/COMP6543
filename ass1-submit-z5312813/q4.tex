@@ -1,0 +1,69 @@
+\documentclass{article}
+\usepackage{amsmath} 
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\title{COMP6453 Assignment I: Q4}
+\author{Joules Patman}
+\begin{document}
+\maketitle
+
+
+Q4)
+
+a)
+The maximum number of calls to the SHA-1 function is if we take the first 40 bits (5 bytes) 
+and try to find a collsion for $H(m_1) = H(m_k)$. This is the worst case 
+scenario and $2^{40}$ calls will be required
+\\
+\\
+b)
+But By using the birthday attack we can use the fact that the actual bits of security will be $2^{n/2}$
+where is the number of bits, until we find a collision with probability of 50\%. Thus we will need to 
+compare $2^{20}$ bits instead.
+\\
+\\
+
+c) Pseudocode:
+\begin{algorithm}
+\caption{Find Colliding Hash}
+\begin{algorithmic}[1]
+\STATE \textbf{Define function:}
+\STATE \hspace{1em} \textbf{Define} \texttt{HashTable} \COMMENT{hash table stores (hash, message) pairs}
+\STATE \hspace{1em} $(m_1, h_1) \leftarrow$ \texttt{get40BitsFromSha1()}
+\STATE \hspace{1em} \texttt{didFindHash} $\leftarrow$ \texttt{HashTable.get}($h_1$)
+\IF{\texttt{didFindHash} $\neq$ \texttt{null}}
+    \STATE \hspace{2em} \texttt{HashTable.add}($h_1$)
+\ELSIF{$m_1 == \texttt{val}$}
+    \STATE \hspace{2em} \texttt{skip}
+\ELSE
+    \STATE \hspace{2em} $m_2 \leftarrow$ \texttt{didFindHash}
+\ENDIF
+\STATE \textbf{return} ($h_1, m_1, m_2$)
+\end{algorithmic}
+\end{algorithm}
+
+
+% \begin{lstlisting}[language = <language>, other options]
+% \end{listing}
+% define function:   
+%     // Hash table defines (hash, message) pair
+%     define HashTable
+
+%     (m1, h1) = get40BitsFromSha1()
+
+%     didFindHash = HashTable.get(h1)    
+
+%     if (didFindHash != null) {
+%         HashTable.add(h1)
+%     }
+%     else if (m1 == val) {
+%         skip
+%     }
+%     else {
+%         m2 = didFindHash
+%     }
+
+%     return (h1, m1, m2)
+
+
+\end{document}

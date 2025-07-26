@@ -1,0 +1,380 @@
+\documentclass[12pt]{article}
+
+% -----------------------------------------------------------------------------
+% PACKAGES --------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+
+% Convenience macros ----------------------------------------------------------
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Zp}{\Z_p^{\ast}}
+\newcommand{\xor}{\oplus}
+
+% -----------------------------------------------------------------------------
+% DOCUMENT --------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+\begin{document}
+
+\begin{center}
+    {\LARGE\bf Assignment 2}\\[0.5em]
+    \large \emph{This set consists of 4 questions worth a total of 60 marks}
+\end{center}
+
+% -----------------------------------------------------------------------------
+\section{El Gamal Encryption \hfill (15 Marks)}
+
+Consider the following variant of El~Gamal encryption. Let $p = 2q + 1$ with $p, q$ prime.  Let $G$ be the group of squares modulo~$p$ (so $G$ is a subgroup of $\Zp$ of order~$q$), and let $g$ be a generator of~$G$.  The private key is $(G, g, q, x)$ and the public key is $(G, g, q, h)$, where
+\[ h = g^{x}\quad \text{and}\quad x \stackrel{\$}{\leftarrow} \Z_q. \]
+To encrypt a message $m \in \Z_q$ choose a uniform $r \in \Z_q$, compute
+\[
+    c_1 := g^{r} \bmod p, \qquad
+    c_2 := h^{r} + m \bmod p,
+\]
+and output the ciphertext $\langle c_1, c_2 \rangle$.\\[0.25em]
+\textbf{Problem.} Is this scheme CPA–secure?\;Prove your answer.
+\\
+\textbf{Answer.}
+\\
+A G group of squares modulo p means $\{x^2 \mod(p) : x \in Z_p\}$. So $g \in G$ is an element of
+$\Zp$ of order~$q$. This also means $h, h^r, g, g^r$ are also in $\Zp$ of order~$q$. 
+
+So now for ciphertexts pairs $c_1, c_2$ we will try to 
+show the probability that a bit/message is altered
+with non-negligble probability knowing that the $h,g$ are squares modulo p.
+
+Since p,q are coprime, then there are q in $G$ values of that are squares modulo p 
+and are generators of $G$. Rearrange $p = 2q + 1$ so that it is: $q = \frac{p - 1}{2}$ 
+
+Using $c_2$ we predict the next bit $b \in {0,1}$ 
+by attacking by making a function $f(a)$ from Euler's criterion:
+
+\[
+f(a) = a^{q} = a^{\frac{p-1}{2}} \equiv
+\begin{cases}
+\;1 \pmod{p}, & \text{if } a \text{ is a quadratic residue mod } p,\\[6pt]
+-1 \pmod{p}, & \text{if } a \text{ is a quadratic non-residue mod } p.
+\end{cases}
+\]
+
+For some message  $m \in Z_q$ with the next bit $b$. 
+For $f(h^r + m) \implies f(h^r + b)$
+Cases: 
+
+If b = 0, then $f(h^r + b) = f(h^r + 0) = f(h^r)$ and immediately the probability 
+is that it is quadratic residue is $|G| / |Z*_p| = q / (p - 1)$ 
+
+If b = 1 then $f(h^r + b) = f(h^r + 1)$ and $h^r + 1$ cannot be a square and is not a 
+quadratic residue of $mod$ $p$. Therefore, the probability 
+is that it is a quadratic residue is impossible, so Probability Quadratic residue mod p = 0.
+So we know it is not a quadratic residue
+
+Thus, the probability of predicting the next bit 
+
+\[
+P(B = b )=
+\begin{cases}
+\;\text{if } b = 1, & \text{then } P(B = 1) = 1,\\[6pt]
+\text{if } b = 0, &  \text{then } P(B = 0) =  q / (p - 1).
+\end{cases}
+\]
+
+Therfeore, by the definition of IND-CPA for all efficient Adversary:
+\[\text{Advantage} = |\Pr(B = 1) - \Pr(B = 0)| = |\frac{q - (p - 1)}{(p - 1)}|\]
+
+So $ (q - (p - 1)) / (p - 1) > \text{negligble}$ and the attacker can determine the next bit 
+with a high degree of certainty!!
+
+Ergo, This scheme is not CPA-Secure. 
+
+
+
+
+% -----------------------------------------------------------------------------
+\section{RSA Encryption \hfill (14 Marks: 5 + 4 + 5)}
+
+Three users have RSA public keys $\langle N_1, 3 \rangle,\; \langle N_2, 3 \rangle,$ and $\langle N_3, 3 \rangle$ (\,so each uses $e = 3$\,) with $N_1 < N_2 < N_3$.  To send the \emph{same} message $m \in \{0,1\}^{\ell}$ to each party:
+\begin{enumerate}[label=\arabic*.]
+    \item Choose uniform $r \stackrel{\$}{\leftarrow} \Z^{\ast}_{N_1}$ and compute
+          \[
+              (r^{3} \bmod N_1, \; r^{3} \bmod N_2, \; r^{3} \bmod N_3, \; H(r) \xor m)
+          \]
+          where $H : \Z^{\ast}_{N_1} \to \{0,1\}^{\ell}$ and $\ell \gg n$ (the security parameter).
+\end{enumerate}
+
+\begin{enumerate}[label=\alph*]
+    \item Show that this scheme is \emph{not} CPA–secure; an adversary can recover $m$ from the ciphertext even when $H$ is modeled as a random oracle.
+    \item Propose a simple fix that yields CPA–security with ciphertext length $3\ell + O(n)$.
+    \item Further improve your design so that the scheme remains CPA–secure but the ciphertext length is reduced to $\ell + O(n)$.
+\end{enumerate}
+\vspace*{0.3em}\hfill\textit{(Hint: the Chinese Remainder Theorem)}
+\\
+\textbf{Answer.}
+\\
+
+\underline{Part a)}
+The cipher text according to the algorithm is: $c = H(r) \xor m$. Note, the Hash $H$ modelled as a
+random oracle must be public to all users.
+According to the algorithm, all three users use the same remainder $r$ to encrypt the plain text
+because it's given by the above algo 
+\begin{align}
+r^{3} \bmod N_1 \implies r^{3} \equiv a_1 \bmod N_1
+\\
+r^{3} \bmod N_2 \implies r^{3} \equiv a_2 \bmod N_2
+\\
+r^{3} \bmod N_3 \implies r^{3} \equiv a_3 \bmod N_3
+\end{align}
+Where $a_1, a_2, a_3$ are some $\Z$. As a consequence of the same $r^3$,
+by the chinese remainder theorem, if $N_1, N_2, N_3$ are all pairwise coprime, this means 
+when we find $r$ by solving the above equations, we can decrypt the ciphertext by doing 
+\[H(r) \xor c = H(r) \xor (H(r) \xor m) = m\].
+
+Thus we have recovered m from the One Time Pad, and the algorithm is not CPA-secure!
+% from above since $r \in \Z*_{N_1}$
+
+\underline{Part b)}
+Now we make all the remainders $r$ in the algorithm different:
+\begin{align}
+r_1^{3} \equiv a_1 \bmod N_1
+\\
+r_2^{3} \equiv a_2 \bmod N_2
+\\
+r_3^{3} \equiv a_3 \bmod N_3
+\end{align}
+
+Then a simple fix with ciphertext length $3l + O(n)$ complexity is broadcasting each user:
+\[(H(r_1) \xor m, H(r_2) \xor m, H(r_2) \xor m) = (c_1, c_2, c_3)\]
+because they will know their respective secret $r_n$ to decrypt some $c_n = H(r_n) \xor m$.
+
+This is CPA-secure because the remainders $r_n$ are not dependent on each other like in part a) 
+
+\underline{Part c)}
+To improve the ciphertext complexity we need to broadcast the shared secret $s$ to all the 
+users in the system. 
+\begin{enumerate}
+    \item We first choose uniform $r \stackrel{R}{\leftarrow} \Z^{\ast}_{N_1}$. 
+We also make sure that user's do not use the the same  remainder $r$.
+    \item Encrypt With each $i$th user's public key PK$_i$ using the given $(N_i, 3)$ the
+shared secret $s$ with the public key meaning: PK$_i(s)$. This can only be decrypted with the $i$th user's 
+RSA secret key. This takes $O(n)$ time
+    \item We send PK$_i(s)$ to the $i$th user, as they can only decrypt it with the $i$th user's 
+RSA secret key SK$_i$. So all three users now have the shared secret key $s$.
+    \item To broadcast an encrypted message now, we use $c = H(s) \xor m$ and we send $c$ to all three
+users. The cipher text is now $l$ length.
+\end{enumerate} 
+
+Thus the total complexity is $l + O(n)$ time. Since we have a secret session key in the One Time Pad,
+that does not have any relationship to the other public values this is CPA-secure.
+
+
+
+% -----------------------------------------------------------------------------
+\section{An Insecure Signature with Message Recovery \hfill (15 Marks: 7 + 8)}
+
+Let $T = (\mathcal{G},F,I)$ be a one–way trapdoor permutation defined over $X := \{0,1\}^n$.  Let $H$ be a hash function from domain $\mathcal{M}_0$ to codomain~$X$.  Consider the signature scheme $\mathcal{S} = (\mathcal{G},\mathcal{S},\mathcal{V})$ defined on $(\mathcal{M}_0 \times X, X)$ by
+\begin{align*}
+    \mathcal{S}(\mathsf{sk}; (m_0,m_1)) &:= \sigma \leftarrow I(\mathsf{sk}, H(m_0) \xor m_1), & \text{return } \sigma,\\
+    \mathcal{V}(\mathsf{pk}, (m_0,m_1), \sigma) &:= y \leftarrow F(\mathsf{pk}, \sigma), & \text{accept iff } y = H(m_0) \xor m_1.
+\end{align*}
+
+\begin{enumerate}[label=\arabic*.]
+    \item Show that given $(m_0, \sigma)$, where $\sigma$ is a valid signature on $(m_0,m_1)$, one can recover $m_1$.
+    \item Prove that the scheme is insecure, even when $T$ is one–way and $H$ is modeled as a random oracle.
+\end{enumerate}
+
+\textbf{Answer}
+\\
+\underline{Part a}
+\\
+Things public to us:
+Verifier (V), public key (PK), Hash function $(H)$ and $F$ and these 
+ingredients are required by digital signatures.
+
+Therefore, 
+Given $(\sigma, m_0)$ is a valid signatue, calculate $H(m_0)$
+
+Then $y = F($PK$, \sigma)$ this means for another message $m_1$
+
+$y = H(m_0) \xor {m_1}$
+
+Therefore, we need to cancel out $H(m_0)$.
+
+So $m_1 = y \xor H(m_0) = ( H(m_0) \xor {m_1}) \xor H(m_0) $
+
+And we have recovered $m_1$.
+
+QED
+
+\underline{Part b}
+\\
+Things public to us:
+Verifier (V), public key (PK), Hash function $(H)$ and $F$
+
+Things Given to us:
+
+TODO: 
+We need to produce a valid (message($m_i$), signature($\sigma_i$)) pair, 
+without knowing the secret key (SK).
+
+Again calculate $H(m_0)$. 
+Let's generate random signature $\sigma = {0,1}^n$. This will be our fake signature $\sigma_i$
+
+Nice, let's get the corresponding y value. We do $y = F($PK$, \sigma_i)$
+
+Let's now generate the ith message: $m_i = y \xor H(m_0)$
+
+So now we have a fake $(m_i, \sigma_i)$ pair. 
+
+So when we send $(m_i, \sigma_i)$ to their other receiver, they will perform
+
+$F(pk, \sigma_i) = y$
+
+Then, when they match $y$ it will be the same as  $m_i \xor H(m_0)$ 
+and the receiver will find the signature to be valid!
+
+Therefore the scheme is insecure even when $T$ is one way and $H$ is a random oracle.
+
+
+% -----------------------------------------------------------------------------
+\section{DSA \hfill (15 Marks: 3 + 3 + 3 + 2 + 4)}
+
+To create parameters for the Digital Signature Algorithm (DSA) we first find primes $p$ and $q$ with $q \mid (p - 1)$.  Next we must find $g \in \Zp$ of order~$q$.  Consider the algorithms below.
+
+\subsection*{Algorithm 1}
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{repeat}
+    \begin{enumerate}[label=\alph*.]
+        \item choose $g \leftarrow \Zp$;
+        \item $h \gets g^{q} \bmod p$;
+    \end{enumerate}
+    \item \textbf{until} $(h = 1 \ \land\ g \neq 1)$;
+    \item \textbf{return} $g$.
+\end{enumerate}
+
+\subsection*{Algorithm 2}
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{repeat}
+    \begin{enumerate}[label=\alph*.]
+        \item choose $h \leftarrow \Zp$;
+        \item $g \gets h^{(p-1)/q} \bmod p$;
+    \end{enumerate}
+    \item \textbf{until} $(g \neq 1)$;
+    \item \textbf{return} $g$.
+\end{enumerate}
+
+Answer the following questions.
+\begin{enumerate}[label=\arabic*.]
+    \item What happens in Algorithm 1 if $g$ is chosen such that $\operatorname{ord}(g) = q$? Explain.
+    \item What happens in Algorithm 2 if $h$ is chosen such that $\operatorname{ord}(g) = q$? (Recall that $g = h^{(p-1)/q} \bmod p$.)
+    \item Suppose $p = 64891$ and $q = 103$.  How many loop iterations do you expect Algorithm 1 to execute before it finds a generator?
+    \item If $p$ is 512~bits and $q$
+\end{enumerate}
+
+\textbf{Answer}
+\begin{enumerate}
+\item[]
+Suppose: \\
+\( p = 7 \) \\
+\( q = 2 \)
+
+Therefore for example \\
+\( \mathbb{Z}^{*} = 7 = \{1,2,3,4,5,6\} \)
+
+\textbf{a)} \\
+We go through each element \( x \in  \mathbb{Z}^{*} \), So \( x^2 \bmod 7 \). \\
+\textbf{Algo 1:} \\
+\( 2^2 \bmod 7 = 4 \) \\
+\( 3^2 \bmod 7 = 2 \) \\
+\( 4^2 \bmod 7 = 2 \) \\
+\( 5^2 \bmod 7 = 3 \) \\
+\( 6^2 \bmod 7 = 1 \)
+
+The algorithm goes through the elements in the \( \mathbb{Z}^{*}_p \)
+multiplicative group of integers modulo \( p \) randomly.
+
+Then it raises that particular elemnent \( g \in \mathbb{Z}^{*}_p : g^q \).
+
+and calculates \( h = g^q \bmod(p) \).
+
+It stops when \( h == 1 \) and \( g \) is not 1. Meaning not the trivial \( 1 = 1^q \bmod(p) \).
+
+\textbf{b)} \\
+\( (p-1)/q = 3 \) \\
+So  we go through elements \( x \in \mathbb{Z}^{*} \), So \( x^2 \bmod 7 \). \\
+\textbf{Algo 2:} \\
+\( 2^3 \bmod 7 = 1 \) \\
+\( 3^3 \bmod 7 = 6 \) \\
+\( 4^3 \bmod 7 = 1 \) \\
+\( 5^3 \bmod 7 = 6 \) \\
+\( 6^3 \bmod 7 = 6 \)
+
+The algorithm goes through the elements \( h \) in the \( \mathbb{Z}^{*}_p \). Which is the
+multiplicative group of integers modulo \( p \) randomly.
+
+Then it raises that particular elemnent \( h \in \mathbb{Z}^{*}_p : h^{(p-1)/q} \).
+
+and calculates \( g = h^{(p-1)/q} \bmod(p) \).
+
+It stops when \( g == 1 \).
+
+\textbf{c)} \\
+For \( p = 64891, q = 103 \) I expect algorithm 1 to run at the worst case scenario.
+This means for \( p - 1 \) elements in  \( \mathbb{Z}^{*}_p \), we will hit.
+
+The generators (\( g \)) of order \( q \bmod(p) \) means \( g^q \bmod(p) = 1 \).
+
+So every solution \( g \), to the equation \( g^q \bmod(p) = 1 \) must have order = \( q \).
+
+This is because  \( q | (p - 1) \) and both \( q \) and \( p \) are prime, 
+then the number of generators of \( g \) that exist must be \( q-1 \) 
+to satisfy \( g^q \bmod(p) = 1 \). (Excluding the trivial element \( g = 1 \))
+
+Small example: \\
+if \( p = 23 \) and \( q = 11 \).
+
+Then \( G_{11} = \{1,2,4,6,8,12,13,18,22,3,11\}, |G_{11}| = 11 \), and exlucding the trivial
+element 1, there are \( |G_{11}| - 1 = 10 \; (g) \in G_{11} \) elements that satisfy the equation
+\( g^q \bmod (p) = 1 \) \\
+\( g^{11} \bmod (23) = 1 \)
+
+So checking \( 2^{11} \bmod(23) = 1 \). Indeed is true!.
+
+Therefore, we would expect the probability to hit one of these generators
+to be \( (q-1) / (p-1) \). REMEMBER TO EXLCUDE 1.
+
+Thefore on average, the number of times we expect \( g \) to go through in algorithm 1
+before hitting an number with order \( q \) is \( (p-1) / (q-1) = 636.176 \).
+
+So we expect algorithm 1 to run approx.\ 636 times!
+
+\textbf{d)} \\
+If \( p = 512 \) bits and \( q = 128 \)bit number then algorithm 1 will take 
+\( (2^{512} - 1) / (2^{128} - 1) \approx 2^{512} / 2^{128} \approx 2^{384} \) times.
+
+And the probability is \( 1/2^{284} \)
+
+Therefore it is not good to follow  algorithm 1 in this case
+
+For algorithm 2, we need to find the expected number of loops required to find \( g=1 \) for algorithm 2.
+Since \( q | (p-1) \) then the size of the generator of subgroup of order \( q \) (\( G_q \)) is actually \( q \). 
+
+Therefore the probability that we have to loop again is \( q/(p-1) \)
+
+So probability that we find \( g = 1 \), is \( 1 - q/(p-1) = (p - 1 - q) / (p - 1) \)
+Therefore the probability to find a generator is very very close to 1!
+
+\textbf{e)} \\
+Therefore using the given hint for algorithm 2: \( p = 64891 \) and \( q = 103 \)
+The probability that algorithm 2 computes a generator (\( g = 1 \)) in it's very first loop is 
+
+\(  (p - 1 - q) / (p - 1) = (64891 - 1 - 103) / (64891 - 1) \approx 0.9984! \)
+
+\end{enumerate}
+
+\end{document}

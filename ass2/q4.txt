@@ -1,0 +1,101 @@
+Suppose:
+p = 7
+q = 2
+
+Therefore
+Z* = 7 = {1,2,3,4,5,6}
+
+a) 
+We go through each element x \in  Z*, So x^2 mod 7.
+Algo 1:
+2^2 mod 7 = 4
+3^2 mod 7 = 2
+4^2 mod 7 = 2
+5^2 mod 7 = 3
+6^2 mod 7 = 1
+
+The algorithm goes through all the elements in the Z*_p
+multiplicative group of integers modulo 𝑝 randomly.
+
+Then it raises that particular elemnent g \in Z*_p : g^q.
+
+and calculates h = g^q mod(p).
+
+It stops when h == 1 and g is not 1. Meaning not the trivial 1 = 1^q mod(p).
+
+
+b)
+(p-1)/q = 3
+So  we go through each element x \in Z*, So x^2 mod 7.
+Algo 2:
+2^3 mod 7 = 1
+3^3 mod 7 = 6
+4^3 mod 7 = 1
+5^3 mod 7 = 6
+6^3 mod 7 = 6
+
+The algorithm goes through all the elements h in the Z*_p. Which is the
+multiplicative group of integers modulo 𝑝 randomly.
+
+Then it raises that particular elemnent h \in Z*_p : h^{(p-1)/q}.
+
+and calculates g = h^{(p-1)/q} mod(p).
+
+It stops when g == 1. 
+
+c)
+For (p = 64891, q = 103) I expect algorithm 1 to run at the worst case scenario.
+This means for (p - 1) elements in  Z*_p, we will hit.
+
+The generators (g) of order q mod(p) means g^q mod(p) = 1.
+
+So every solution g, to the equation g^q mod(p) = 1 must have order = q.
+
+This is because  q | (p - 1) and both q and p are prime, 
+then the number of generators of g that exist must be q-1 
+to satisfy g^q mod(p) = 1. (Excluding the trivial element g = 1)
+
+Small example:
+if p = 23 and q = 11.
+
+Then G_11 = {1,2,4,6,8,12,13,18,22,3,11}, |G_11| = 11, and exlucding the trivial
+element 1, there are |G_11| - 1 = 10 (g) \in G_11 elements that satisfy the equation
+g^q mod (p) = 1
+g^11 mod (23) = 1
+
+So checking 2^11 mod(23) = 1. Indeed is true!.
+
+Therefore, we would expect the probability to hit one of these generators
+to be (q-1) / (p-1). REMEMBER TO EXLCUDE 1.
+
+Thefore on average, the number of times we expect g to go through in algorithm 1
+before hitting an number with order q is (p-1) / (q-1) = 636.176.
+
+So we expect algorithm 1 to run approx. 636 times!
+
+d)
+If p = 512 bits and q = 128bit number then algorithm 1 will take 
+(2^512 - 1) / (2^128 - 1) ~ 2^512 / 2^128 ~ 2^384 times.
+
+And the probability is 1/2^284
+
+Therefore it is not good to follow  algorithm 1 in this case
+
+For algorithm 2, we need to find the expected number of loops required to find g=1 for algorithm 2.
+Since q | (p-1) then the size of the generator of subgroup of order q (G_q) is actually q. 
+
+Therefore the probability that we have to loop again is q/(p-1)
+
+So probability that we find g = 1, is 1 - q/(p-1) = (p - 1 - q) / (p - 1)
+Therefore the probability to find a generator is very very close to 1!
+
+e) 
+
+Therefore using the given hint for algorithm 2: p = 64891 and q = 103
+The probability that algorithm 2 computes a generator (g = 1) in it's very first loop is 
+
+ (p - 1 - q) / (p - 1) = (64891 - 1 - 103) / (64891 - 1) ~ 0.9984!
+
+
+
+
